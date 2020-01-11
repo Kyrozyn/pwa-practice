@@ -4,6 +4,7 @@ import Home from "./Home";
 import About from "./About";
 import Contact from "./Contact";
 import Test from "./Test";
+import NotFound from "./NotFound";
 import {Container} from "@material-ui/core";
 import AppBar from "@material-ui/core/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
@@ -31,6 +32,7 @@ class Main extends Component {
                         <Route path="/about" component={About}/>
                         <Route path="/contact" component={Contact}/>
                         <Route path="/test" component={Test}/>
+                        <Route path="/404" component={NotFound}/>
                     </Container>
                 </div>
             </HashRouter>

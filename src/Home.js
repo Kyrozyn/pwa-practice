@@ -1,22 +1,94 @@
 import React, {Component} from "react";
+import {Button, Container, Table, TableBody, TableHead, TableRow} from "@material-ui/core";
+import TableCell from "@material-ui/core/TableCell";
+import {Alert} from '@material-ui/lab';
 
 class Home extends Component {
+
+    constructor(props) {
+        super(props);
+        this.state = {
+            error: null,
+            isLoaded: false,
+            items: {},
+            page: 1
+        }
+    }
+
+    halamanSelanjutnya() {
+        var a = this.state.page + 1;
+        this.setState({page: a});
+        this.panggilApi(a);
+    }
+
+    halamanSebelumnya() {
+        var a = this.state.page - 1;
+        if (a >= 1) {
+            this.setState({page: a});
+            this.panggilApi(a);
+        }
+    }
+
+    panggilApi(halaman) {
+        fetch("http://localhost:8001/records/users?order=id&page=" + halaman)
+            .then(response => response.json())
+            .then(
+                (result) => {
+                    this.setState({
+                        isLoaded: true,
+                        items: result.records
+                    })
+                },
+                (error) => {
+                    this.setState({
+                        isLoaded: true,
+                        error
+                    })
+                }
+            );
+    }
+
+    componentDidMount() {
+        this.panggilApi(1)
+    }
+
     render() {
-        return (
-            <div>
-                <h2>Home</h2>
-                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                    Morbi et est vitae sapien hendrerit mattis sit amet sed purus.
-                    Nunc commodo sapien risus, eget commodo libero molestie vel.
-                    Donec a tortor tincidunt, lacinia orci eget, feugiat leo.
-                    Etiam volutpat molestie tempor. Mauris id eros porttitor, hendrerit odio
-                    eget, laoreet mi. Vestibulum diam erat, scelerisque id eros nec, iaculis
-                    pulvinar arcu. Mauris vestibulum magna vitae molestie egestas. Vestibulum
-                    lobortis diam vel mauris rutrum, eget maximus purus lacinia. Sed et tellus
-                    vel nibh vestibulum pretium non sit amet tortor. Nulla in mattis ligula.
-                    Curabitur feugiat eros nec odio pretium ullamcorper.</p>
-            </div>
-        );
+        const {error, isLoaded, items} = this.state;
+        if (error) {
+            return <Alert severity={"error"}>Data gagal diambil!</Alert>
+        } else if (!isLoaded) {
+            return <Alert severity={"info"}>Loading.....</Alert>
+        } else {
+            return (
+                <Container>
+                    <div>
+                        <Table>
+                            <TableHead>
+                                <TableCell>ID</TableCell>
+                                <TableCell>Username</TableCell>
+                                <TableCell>Password</TableCell>
+                            </TableHead>
+                            <TableBody>
+                                {items.map(item => (
+                                    <TableRow key={item.id}>
+                                        <TableCell component={"th"} scope={"item"}>{item.id}</TableCell>
+                                        <TableCell>{item.username}</TableCell>
+                                        <TableCell>{item.password}</TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                        <br/>
+                        <Button onClick={() => {
+                            this.halamanSebelumnya()
+                        }}>Halaman Sebelumnya</Button>
+                        <Button onClick={() => {
+                            this.halamanSelanjutnya()
+                        }}>Halaman Selanjutnya</Button>
+                    </div>
+                </Container>
+            );
+        }
     }
 }
 
